@@ -1,9 +1,9 @@
-"""!pip install numpy
-!pip install matplotlib
-!pip install pandas
-!pip install scikit-learn
-!pip install seaborn"""
-
+#!pip install seaborn
+#!pip install numpy
+#!pip install matplotlib
+#!pip install pandas
+#!pip install scikit-learn
+#------------------required libraraies-------------------------------------------------------------------
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -20,10 +20,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 
-#Load the titanic data
+# Load the titanic data usinf sns into a dataframe
 titanic = sns.load_dataset('titanic')
 print("Data head", titanic.head())
-print("count", titanic.count())
+print("count of Non NA rows", titanic.count())
 print("missing data in deck and age. embarked and embark_town don't seem relevant so we'll drop them as well.")
 print("It's unclear what alive refers to so we'll ignore it.") 
 features = ['pclass', 'sex', 'age', 'sibsp', 'parch', 'fare', 'class', 'who', 'adult_male', 'alone']
@@ -73,7 +73,10 @@ param_grid = {
 }
 #Perform grid search cross-validation and fit the best model to the training data
 cv = StratifiedKFold(n_splits=5, shuffle=True)
-
+pipeline = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    ('classifier', RandomForestClassifier(random_state=42))
+    ])
 #tTrain the pipeline model using GridSearchCV
 model = GridSearchCV(estimator=pipeline, param_grid=param_grid, cv=cv, scoring='accuracy', verbose=2)
 model.fit(X_train, y_train)
@@ -128,7 +131,7 @@ plt.show()
 test_score = model.score(X_test, y_test)
 print(f"\nTest set accuracy: {test_score:.2%}")
 
-# The test set accuracy is somewhat satisfactory. However,regarding the feature impoirtances, 
+# The test set accuracy is somewhat satisfactory. However,regarding the feature importances, 
 # it's crucially important to realize that there is most likely plenty of dependence amongst these variables, 
 # and a more detailed modelling approach including correlation analysis is required to draw proper conclusions. 
 # For example, no doubt there is significant information shared by the variables `age`, `sex_male`, and `who_man`.
@@ -173,7 +176,8 @@ plt.tight_layout()
 plt.show()
 
 
-#EXTRACT agin the important featurescoefficients = model.best_estimator_.named_steps['classifier'].coef_[0]
+# EXTRACT again the important features 
+coefficients = model.best_estimator_.named_steps['classifier'].coef_[0]
 
 # Combine numerical and categorical feature names
 numerical_feature_names = numerical_features
